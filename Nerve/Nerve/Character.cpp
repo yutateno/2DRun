@@ -41,6 +41,7 @@ Character::Character()
 
 	m_x = 500.0f;
 	m_y = 500.0f;
+	m_preY = m_y;
 
 	m_frameWait = 0;
 
@@ -58,6 +59,7 @@ Character::Character()
 	m_longJump = false;
 	m_jumpPower = 10;
 	m_gravityPower = 0;
+	m_fallNow = false;
 
 	ZeroMemory(m_direction, sizeof(m_direction));
 }
@@ -70,6 +72,8 @@ Character::~Character()
 void Character::Process()
 {
 	FrameSprite(MOVE_DIRE::walk);
+
+	m_preY = m_y;
 
 	// 右
 	if (m_rightDire)
@@ -105,7 +109,40 @@ void Character::Process()
 	// 地面に触れてない(浮いてる
 	if (!m_groundFlag)
 	{
-		m_gravityPower += 2;
+		// 落ちている最中に動いている方向の壁が壁ジャン出来るやつだったら
+		if (m_fallNow
+			&&((m_rightDire
+				&& m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 64) / m_map->GetSpriteSize())] == 2
+				|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 64) / m_map->GetSpriteSize())] == 2)
+				|| (!m_rightDire
+					&& m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x) / m_map->GetSpriteSize())] == 2
+					|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x) / m_map->GetSpriteSize())] == 2)))
+		{
+			m_gravityPower += 0.1f;
+
+			if (InputPad::GetPadButtonData(XINPUT_PAD::NUM01, XINPUT_PAD::BUTTON_A) == 1)
+			{
+				if (m_rightDire)
+				{
+					m_x -= 1;
+				}
+				else
+				{
+					m_x += 1;
+				}
+				m_rightDire = !m_rightDire;
+				m_gravityPower = 0;
+				m_jumpFlag = true;
+				m_longJump = true;
+				m_groundFlag = false;
+				m_fallNow = false;
+				m_jumpPower = 10;
+			}
+		}
+		else
+		{
+			m_gravityPower += 2;
+		}
 		m_y += m_gravityPower;
 
 		// 地面に埋まったら
@@ -116,6 +153,7 @@ void Character::Process()
 				|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0)
 			{
 				m_y -= 1;
+				m_fallNow = false;
 				m_gravityPower = 0;
 				m_jumpPower = 10;
 				m_groundFlag = true;
@@ -130,6 +168,7 @@ void Character::Process()
 		&& m_map->GetMapID()[static_cast<int>((m_y + 64) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] == 0)
 	{
 		m_groundFlag = false;
+		m_fallNow = true;
 	}
 
 	// 地面にいてジャンプボタン押したら
@@ -138,6 +177,7 @@ void Character::Process()
 		m_jumpFlag = true;
 		m_longJump = true;
 		m_groundFlag = false;
+		m_fallNow = false;
 		m_jumpPower = 10;
 	}
 
@@ -165,9 +205,16 @@ void Character::Process()
 				|| m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0)
 			{
 				m_y += 1;
+				m_fallNow = true;
 				m_jumpFlag = false;
 			}
 		}
+	}
+
+	// 直前のY座標が今のY座標より上だったら
+	if (m_preY < m_y)
+	{
+		m_fallNow = true;
 	}
 }
 

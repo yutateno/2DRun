@@ -299,7 +299,7 @@ void Main::Render()
 	m_pText->Render(str, 0, 10);
 
 
-	m_pDraw->Render(m_pCharacter->GetID(), m_pCharacter->GetX(), m_pCharacter->GetY(), m_pCharacter->GetXSize(), m_pCharacter->GetYSize(), true, false);
+	m_pDraw->Render(m_pCharacter->GetID(), m_pCharacter->GetX(), m_pCharacter->GetY(), m_pCharacter->GetXSize(), m_pCharacter->GetYSize(), m_pCharacter->GetRightDire(), false);
 
 
 

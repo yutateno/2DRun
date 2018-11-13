@@ -60,7 +60,13 @@ private:
 	float m_jumpPower;	
 
 	/// d—Í
-	float m_gravityPower;		
+	float m_gravityPower;	
+
+	/// —‚¿‚Ä‚¢‚é‚©‚Ç‚¤‚©
+	float m_fallNow;
+
+	/// ’¼‘O‚ÌYÀ•W
+	float m_preY;
 
 
 public:
