@@ -40,27 +40,27 @@ private:
 	bool m_rightDire;
 
 	/// スピード
-	int speed;					
+	int m_speed;					
 
 
 	/// マップでのあたり判定のため
-	Map* map;
+	Map* m_map;
 
 	/// ジャンプ関連
 	/// 地面に触れてるか
-	bool Groundflag;
+	bool m_groundFlag;
 
 	/// ジャンプしているか
-	bool Jumpflag;
+	bool m_jumpFlag;
 
 	/// 長押しジャンプか
-	bool Longjump;		
+	bool m_longJump;		
 
 	/// ジャンプ力
-	float Jumppower;	
+	float m_jumpPower;	
 
 	/// 重力
-	float Gravitypower;		
+	float m_gravityPower;		
 
 
 public:

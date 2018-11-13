@@ -49,15 +49,15 @@ Character::Character()
 
 	m_rightDire = true;
 
-	speed = 4;
+	m_speed = 4;
 
-	map = new Map;
+	m_map = new Map;
 
-	Groundflag = false;
-	Jumpflag = false;
-	Longjump = false;
-	Jumppower = 10;
-	Gravitypower = 0;
+	m_groundFlag = false;
+	m_jumpFlag = false;
+	m_longJump = false;
+	m_jumpPower = 10;
+	m_gravityPower = 0;
 
 	ZeroMemory(m_direction, sizeof(m_direction));
 }
@@ -74,13 +74,13 @@ void Character::Process()
 	// 右
 	if (m_rightDire)
 	{
-		m_x += speed;
+		m_x += m_speed;
 		// 埋まったら
-		if (map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0
-			|| map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0)
+		if (m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0
+			|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0)
 		{
-			while (map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0
-				|| map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0)
+			while (m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0
+				|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0)
 			{
 				m_x -= 1;
 			}
@@ -89,13 +89,13 @@ void Character::Process()
 	// 左
 	else
 	{
-		m_x -= speed;
+		m_x -= m_speed;
 		// 埋まったら
-		if (map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0
-			|| map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0)
+		if (m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0
+			|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0)
 		{
-			while (map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0
-				|| map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0)
+			while (m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0
+				|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0)
 			{
 				m_x += 1;
 			}
@@ -103,70 +103,69 @@ void Character::Process()
 	}
 
 	// 地面に触れてない(浮いてる
-	if (this->Groundflag == false)
+	if (!m_groundFlag)
 	{
-		this->Gravitypower += 2;
-		m_y += this->Gravitypower;
+		m_gravityPower += 2;
+		m_y += m_gravityPower;
 
 		// 地面に埋まったら
-		if (map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0
-			|| map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0)
+		if (m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0
+			|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0)
 		{
-			while (map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0
-				|| map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0)
+			while (m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0
+				|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0)
 			{
 				m_y -= 1;
-				this->Gravitypower = 0;
-				Jumppower = 10;
-				this->Groundflag = true;
-				this->Jumpflag = false;
+				m_gravityPower = 0;
+				m_jumpPower = 10;
+				m_groundFlag = true;
+				m_jumpFlag = false;
 			}
 		}
 	}
 
 	// 上の端から落ちたら
-	if (this->Groundflag == true
-		&& map->GetMapID()[static_cast<int>((m_y + 64) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] == 0
-		&& map->GetMapID()[static_cast<int>((m_y + 64) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] == 0)
+	if (m_groundFlag
+		&& m_map->GetMapID()[static_cast<int>((m_y + 64) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] == 0
+		&& m_map->GetMapID()[static_cast<int>((m_y + 64) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] == 0)
 	{
-		this->Groundflag = false;
+		m_groundFlag = false;
 	}
 
 	// 地面にいてジャンプボタン押したら
-	if (this->Groundflag == true
-		&& InputPad::GetPadButtonData(XINPUT_PAD::NUM01,XINPUT_PAD::BUTTON_A) == 1)
+	if (m_groundFlag && InputPad::GetPadButtonData(XINPUT_PAD::NUM01,XINPUT_PAD::BUTTON_A) == 1)
 	{
-		this->Jumpflag = true;
-		this->Longjump = true;
-		this->Groundflag = false;
-		this->Jumppower = 10;
+		m_jumpFlag = true;
+		m_longJump = true;
+		m_groundFlag = false;
+		m_jumpPower = 10;
 	}
 
 	// ジャンプ動作していたら
-	if (this->Jumpflag == true)
+	if (m_jumpFlag)
 	{
 		if (InputPad::GetPadButtonData(XINPUT_PAD::NUM01, XINPUT_PAD::BUTTON_A) == -1)
 		{
-			this->Longjump = false;
+			m_longJump = false;
 		}
 		// 長押ししていたら
-		if (this->Longjump == true
+		if (m_longJump
 			&& InputPad::GetPadButtonData(XINPUT_PAD::NUM01, XINPUT_PAD::BUTTON_A) > 1
-			&& this->Jumppower <= 30)
+			&& m_jumpPower <= 30)
 		{
-			this->Jumppower += 5;
+			m_jumpPower += 5;
 		}
-		m_y -= this->Jumppower;
+		m_y -= m_jumpPower;
 
 		// 上に埋まったら
-		if (map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0
-			|| map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0)
+		if (m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0
+			|| m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0)
 		{
-			while (map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0
-				|| map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0)
+			while (m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0
+				|| m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0)
 			{
 				m_y += 1;
-				this->Jumpflag = false;
+				m_jumpFlag = false;
 			}
 		}
 	}
