@@ -22,7 +22,7 @@ struct SIMPLESHADER_CONSTANT_BUFFER
 class Draw
 {
 private:
-	HRESULT InitModel(float xSize, float ySize, bool flipHorizontal, bool flipVertical);
+	HRESULT InitModel(float xSize, float ySize);
 	HRESULT MakeShader(LPSTR, LPSTR, LPSTR, void**, ID3DBlob**);
 	void RenderSprite(D3DXMATRIX& World, ID3D11ShaderResourceView* pTexture);
 
@@ -44,6 +44,6 @@ private:
 public:
 	Draw();
 	~Draw();
-	HRESULT Init(ID3D11DeviceContext* pContext, DWORD width, DWORD height, LPCWSTR* p_fileName, const int num, float xSize, float ySize, bool flipHorizontal, bool flipVertical);
-	void Render(int num, float x, float y);
+	HRESULT Init(ID3D11DeviceContext* pContext, DWORD width, DWORD height, LPCWSTR* p_fileName, const int num, float xSize, float ySize);
+	void Render(int num, float x, float y, float xSize, float ySize, bool flipHorizontal, bool flipVertica);
 };

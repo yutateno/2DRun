@@ -6,20 +6,26 @@ void Character::FrameSprite(MOVE_DIRE direction)
 {
 	if (m_frameWait >= m_frameWaitTimer)
 	{
-		if (m_ID >= static_cast<int>(direction) * m_frame && m_ID <= static_cast<int>(direction) * m_frame + (m_frame - 1))
+		switch (direction)
 		{
-			if (m_ID >= static_cast<int>(direction) * m_frame + (m_frame - 1))
+		case MOVE_DIRE::walk:
+			if (m_ID >= m_walkFrame - 1)
 			{
-				m_ID = static_cast<int>(direction) * m_frame;
+				m_ID = 0;
 			}
 			else
 			{
 				m_ID++;
 			}
-		}
-		else
-		{
-			m_ID = static_cast<int>(direction) * m_frame;
+			break;
+
+		case MOVE_DIRE::jump:
+			m_ID = static_cast<int>(MOVE_DIRE::jump);
+			break;
+
+		case MOVE_DIRE::fall:
+			m_ID = static_cast<int>(MOVE_DIRE::fall);
+			break;
 		}
 		m_frameWait = 0;
 	}
@@ -31,12 +37,27 @@ void Character::FrameSprite(MOVE_DIRE direction)
 
 Character::Character()
 {
-	m_ID = static_cast<int>(MOVE_DIRE::right) * m_frame;
+	m_ID = 0;
 
-	m_x = 0.0f;
-	m_y = 0.0f;
+	m_x = 500.0f;
+	m_y = 500.0f;
 
 	m_frameWait = 0;
+
+	m_xSize = 64.0f;
+	m_ySize = 64.0f;
+
+	m_rightDire = true;
+
+	speed = 4;
+
+	map = new Map;
+
+	Groundflag = false;
+	Jumpflag = false;
+	Longjump = false;
+	Jumppower = 10;
+	Gravitypower = 0;
 
 	ZeroMemory(m_direction, sizeof(m_direction));
 }
@@ -48,93 +69,105 @@ Character::~Character()
 
 void Character::Process()
 {
-	/// コントローラーによる操作
-	if (InputPad::GetPadThumbData(XINPUT_PAD::NUM01, XINPUT_PAD::STICK_LEFT_X) > 0)
+	FrameSprite(MOVE_DIRE::walk);
+
+	// 右
+	if (m_rightDire)
 	{
-		m_direction[static_cast<int>(DIRECTION::right)] = true;
+		m_x += speed;
+		// 埋まったら
+		if (map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0
+			|| map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0)
+		{
+			while (map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0
+				|| map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0)
+			{
+				m_x -= 1;
+			}
+		}
 	}
+	// 左
 	else
 	{
-		m_direction[static_cast<int>(DIRECTION::right)] = false;
-	}
-	if (InputPad::GetPadThumbData(XINPUT_PAD::NUM01, XINPUT_PAD::STICK_LEFT_X) < 0)
-	{
-		m_direction[static_cast<int>(DIRECTION::left)] = true;
-	}
-	else
-	{
-		m_direction[static_cast<int>(DIRECTION::left)] = false;
-	}
-	if (InputPad::GetPadThumbData(XINPUT_PAD::NUM01, XINPUT_PAD::STICK_LEFT_Y) > 0)
-	{
-		m_direction[static_cast<int>(DIRECTION::up)] = true;
-	}
-	else
-	{
-		m_direction[static_cast<int>(DIRECTION::up)] = false;
-	}
-	if (InputPad::GetPadThumbData(XINPUT_PAD::NUM01, XINPUT_PAD::STICK_LEFT_Y) < 0)
-	{
-		m_direction[static_cast<int>(DIRECTION::down)] = true;
-	}
-	else
-	{
-		m_direction[static_cast<int>(DIRECTION::down)] = false;
+		m_x -= speed;
+		// 埋まったら
+		if (map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0
+			|| map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0)
+		{
+			while (map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0
+				|| map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0)
+			{
+				m_x += 1;
+			}
+		}
 	}
 
+	// 地面に触れてない(浮いてる
+	if (this->Groundflag == false)
+	{
+		this->Gravitypower += 2;
+		m_y += this->Gravitypower;
 
-	/// 操作に対する向きと動き
-	if (m_direction[static_cast<int>(DIRECTION::left)])
-	{
-		if (m_direction[static_cast<int>(DIRECTION::down)])
+		// 地面に埋まったら
+		if (map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0
+			|| map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0)
 		{
-			m_x -= 0.01f / sqrtf(2);
-			m_y += 0.01f / sqrtf(2);
-			FrameSprite(MOVE_DIRE::leftDown);
-		}
-		else if (m_direction[static_cast<int>(DIRECTION::up)])
-		{
-			m_x -= 0.01f / sqrtf(2);
-			m_y -= 0.01f / sqrtf(2);
-			FrameSprite(MOVE_DIRE::leftUp);
-		}
-		else
-		{
-			m_x -= 0.01f;
-			FrameSprite(MOVE_DIRE::left);
+			while (map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0
+				|| map->GetMapID()[static_cast<int>((m_y + 61) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0)
+			{
+				m_y -= 1;
+				this->Gravitypower = 0;
+				Jumppower = 10;
+				this->Groundflag = true;
+				this->Jumpflag = false;
+			}
 		}
 	}
-	if (m_direction[static_cast<int>(DIRECTION::right)])
+
+	// 上の端から落ちたら
+	if (this->Groundflag == true
+		&& map->GetMapID()[static_cast<int>((m_y + 64) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] == 0
+		&& map->GetMapID()[static_cast<int>((m_y + 64) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] == 0)
 	{
-		if (m_direction[static_cast<int>(DIRECTION::down)])
-		{
-			m_x += 0.01f / sqrtf(2);
-			m_y += 0.01f / sqrtf(2);
-			FrameSprite(MOVE_DIRE::rightDown);
-		}
-		else if (m_direction[static_cast<int>(DIRECTION::up)])
-		{
-			m_x += 0.01f / sqrtf(2);
-			m_y -= 0.01f / sqrtf(2);
-			FrameSprite(MOVE_DIRE::rightUp);
-		}
-		else
-		{
-			m_x += 0.01f;
-			FrameSprite(MOVE_DIRE::right);
-		}
+		this->Groundflag = false;
 	}
-	if (!m_direction[static_cast<int>(DIRECTION::right)] && !m_direction[static_cast<int>(DIRECTION::left)])
+
+	// 地面にいてジャンプボタン押したら
+	if (this->Groundflag == true
+		&& InputPad::GetPadButtonData(XINPUT_PAD::NUM01,XINPUT_PAD::BUTTON_A) == 1)
 	{
-		if (m_direction[static_cast<int>(DIRECTION::down)])
+		this->Jumpflag = true;
+		this->Longjump = true;
+		this->Groundflag = false;
+		this->Jumppower = 10;
+	}
+
+	// ジャンプ動作していたら
+	if (this->Jumpflag == true)
+	{
+		if (InputPad::GetPadButtonData(XINPUT_PAD::NUM01, XINPUT_PAD::BUTTON_A) == -1)
 		{
-			m_y += 0.01f;
-			FrameSprite(MOVE_DIRE::down);
+			this->Longjump = false;
 		}
-		if (m_direction[static_cast<int>(DIRECTION::up)])
+		// 長押ししていたら
+		if (this->Longjump == true
+			&& InputPad::GetPadButtonData(XINPUT_PAD::NUM01, XINPUT_PAD::BUTTON_A) > 1
+			&& this->Jumppower <= 30)
 		{
-			m_y -= 0.01f;
-			FrameSprite(MOVE_DIRE::up);
+			this->Jumppower += 5;
+		}
+		m_y -= this->Jumppower;
+
+		// 上に埋まったら
+		if (map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0
+			|| map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0)
+		{
+			while (map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 3) / map->GetSpriteSize())] != 0
+				|| map->GetMapID()[static_cast<int>((m_y + 3) / map->GetSpriteSize())][static_cast<int>((m_x + 61) / map->GetSpriteSize())] != 0)
+			{
+				m_y += 1;
+				this->Jumpflag = false;
+			}
 		}
 	}
 }
@@ -152,4 +185,19 @@ float Character::GetX()
 float Character::GetY()
 {
 	return m_y;
+}
+
+float Character::GetXSize()
+{
+	return m_xSize;
+}
+
+float Character::GetYSize()
+{
+	return m_ySize;
+}
+
+bool Character::GetRightDire()
+{
+	return m_rightDire;
 }

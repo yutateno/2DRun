@@ -25,6 +25,7 @@
     <ClInclude Include="Draw.hpp" />
     <ClInclude Include="Input.hpp" />
     <ClInclude Include="Main.hpp" />
+    <ClInclude Include="Map.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Character.cpp" />
@@ -32,6 +33,7 @@
     <ClCompile Include="Draw.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Map.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="SpriteText.hlsl">

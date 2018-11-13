@@ -20,7 +20,7 @@ Draw::~Draw()
 
 
 // Direct3D初期化
-HRESULT Draw::Init(ID3D11DeviceContext* pContext, DWORD width, DWORD height, LPCWSTR* p_fileName, const int num, float xSize, float ySize, bool flipHorizontal, bool flipVertical)
+HRESULT Draw::Init(ID3D11DeviceContext* pContext, DWORD width, DWORD height, LPCWSTR* p_fileName, const int num, float xSize, float ySize)
 {
 	//デバイスとコンテキストをコピー
 	m_pDeviceContext = pContext;
@@ -64,7 +64,7 @@ HRESULT Draw::Init(ID3D11DeviceContext* pContext, DWORD width, DWORD height, LPC
 	}
 
 	// バーテックスバッファー作成
-	if (FAILED(InitModel(xSize, ySize, flipHorizontal, flipVertical)))
+	if (FAILED(InitModel(xSize, ySize)))
 	{
 		return E_FAIL;
 	}
@@ -164,16 +164,16 @@ HRESULT Draw::MakeShader(LPSTR szFileName, LPSTR szFuncName, LPSTR szProfileName
 
 
 // ポリゴン、メッシュなどのジオメトリ関連を初期化
-HRESULT Draw::InitModel(float xSize, float ySize, bool flipHorizontal, bool flipVertical)
+HRESULT Draw::InitModel(float xSize, float ySize)
 {
 	// バーテックスバッファー作成
 	// 気をつけること。z値を１以上にしない。クリップ空間でz=1は最も奥を意味する。したがって描画されない。
 	SimpleVertex vertices[] =
 	{
-		D3DXVECTOR3(0		,0		,0),D3DXVECTOR2(0							,0							),//頂点1,
-		D3DXVECTOR3(0		,ySize	,0),D3DXVECTOR2(0							,1 + (flipHorizontal * -2)	),//頂点2
-		D3DXVECTOR3(xSize	,0		,0),D3DXVECTOR2(1 + (flipVertical * -2)		,0							), //頂点3
-		D3DXVECTOR3(xSize	,ySize	,0),D3DXVECTOR2(1 + (flipVertical * -2)		,1 + (flipHorizontal * -2)	), //頂点4
+		D3DXVECTOR3(0		,0		,0),D3DXVECTOR2(0 ,0),//頂点1,
+		D3DXVECTOR3(0		,ySize	,0),D3DXVECTOR2(0 ,1),//頂点2
+		D3DXVECTOR3(xSize	,0		,0),D3DXVECTOR2(1 ,0), //頂点3
+		D3DXVECTOR3(xSize	,ySize	,0),D3DXVECTOR2(1 ,1), //頂点4
 	};
 
 	D3D11_BUFFER_DESC bd;
@@ -195,12 +195,14 @@ HRESULT Draw::InitModel(float xSize, float ySize, bool flipHorizontal, bool flip
 
 
 // シーンを画面にレンダリング
-void Draw::Render(int num, float x, float y)
+void Draw::Render(int num, float x, float y, float xSize, float ySize, bool flipHorizontal, bool flipVertical)
 {
 	D3DXMATRIX World;
+	D3DXMATRIX Turn;
+	D3DXMatrixScaling(&Turn, flipHorizontal ? -1.0f : 1.0f, flipVertical ? -1.0f : 1.0f, 1.0f);
 	D3DXMATRIX Tran;
-	D3DXMatrixTranslation(&Tran, x, y, 0);
-	World = Tran;
+	D3DXMatrixTranslation(&Tran, flipHorizontal ? x + 64 : x, flipVertical ? y + 64 : y, 0);
+	World = Turn * Tran;
 	RenderSprite(World, m_pTexture[num]);
 }
 

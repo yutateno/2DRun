@@ -253,26 +253,25 @@ HRESULT Main::InitD3D()
 
 	m_pCharacter = new Character;
 
+	m_pMap = new Map;
+
 
 	/// ゲームの素材の初期化
 	m_pDraw = new Draw;
-	const int fileNum = 24;
-	LPCWSTR fileName[] = { L"media\\clph_2d\\clph\\1_1.png" , L"media\\clph_2d\\clph\\1_2.png", L"media\\clph_2d\\clph\\1_3.png"
-						 , L"media\\clph_2d\\clph\\2_1.png" , L"media\\clph_2d\\clph\\2_2.png", L"media\\clph_2d\\clph\\2_3.png" 
-						 , L"media\\clph_2d\\clph\\3_1.png" , L"media\\clph_2d\\clph\\3_2.png", L"media\\clph_2d\\clph\\3_3.png" 
-						 , L"media\\clph_2d\\clph\\4_1.png" , L"media\\clph_2d\\clph\\4_2.png", L"media\\clph_2d\\clph\\4_3.png" 
-						 , L"media\\clph_2d\\clph\\6_1.png" , L"media\\clph_2d\\clph\\6_2.png", L"media\\clph_2d\\clph\\6_3.png" 
-						 , L"media\\clph_2d\\clph\\7_1.png" , L"media\\clph_2d\\clph\\7_2.png", L"media\\clph_2d\\clph\\7_3.png" 
-						 , L"media\\clph_2d\\clph\\8_1.png" , L"media\\clph_2d\\clph\\8_2.png", L"media\\clph_2d\\clph\\8_3.png" 
-						 , L"media\\clph_2d\\clph\\9_1.png" , L"media\\clph_2d\\clph\\9_2.png", L"media\\clph_2d\\clph\\9_3.png" };
-	if (FAILED(m_pDraw->Init(m_pDeviceContext, WINDOW_WIDTH, WINDOW_HEIGHT, fileName, fileNum, 64, 64, false, false)))
+	const int fileNum = 11;
+	LPCWSTR fileName[] = { L"media\\clph_2d\\scrollaction\\walk\\1.png" , L"media\\clph_2d\\scrollaction\\walk\\2.png"
+						 , L"media\\clph_2d\\scrollaction\\walk\\3.png" , L"media\\clph_2d\\scrollaction\\walk\\4.png"
+						 , L"media\\clph_2d\\scrollaction\\walk\\5.png" , L"media\\clph_2d\\scrollaction\\walk\\6.png"
+						 , L"media\\clph_2d\\scrollaction\\ex\\fall.png" , L"media\\clph_2d\\scrollaction\\ex\\jamp.png"
+						 , L"media\\map\\kabe.png" , L"media\\map\\jumpKabe.png" , L"media\\map\\kabeDead.png" };
+	if (FAILED(m_pDraw->Init(m_pDeviceContext, WINDOW_WIDTH, WINDOW_HEIGHT, fileName, fileNum, 64, 64)))
 	{
 		return E_FAIL;
 	}
 
 
 	/// フルスクリーンにする（DirectX11なのでALT+Enterで切り替え可
-	m_pSwapChain->SetFullscreenState(true, 0);
+	m_pSwapChain->SetFullscreenState(false, 0);
 
 
 	return S_OK;
@@ -287,20 +286,60 @@ void Main::Render()
 	m_pDeviceContext->ClearRenderTargetView(m_pBackBuffer_TexRTV, ClearColor);						/// カラーバッファクリア
 	m_pDeviceContext->ClearDepthStencilView(m_pBackBuffer_DSTexDSV, D3D11_CLEAR_DEPTH, 1.0f, 0);	/// デプスステンシルバッファクリア
 
-	m_pDraw->Render(m_pCharacter->GetID(), m_pCharacter->GetX(), m_pCharacter->GetY());
-
-	char str[256];
-	sprintf(str, "%d", InputPad::GetPadThumbData(XINPUT_PAD::NUM01, XINPUT_PAD::STICK_LEFT_X));
+	static DWORD time = 0;
+	static int frame = 0;
+	frame++;
+	static char str[256];
+	if (timeGetTime() - time > 1000)
+	{
+		sprintf(str, "fps=%d", frame);
+		time = timeGetTime();
+		frame = 0;
+	}
 	m_pText->Render(str, 0, 10);
 
 
-	m_pSwapChain->Present(0, 0);/// 画面更新（バックバッファをフロントバッファに）
+	m_pDraw->Render(m_pCharacter->GetID(), m_pCharacter->GetX(), m_pCharacter->GetY(), m_pCharacter->GetXSize(), m_pCharacter->GetYSize(), true, false);
+
+
+
+	for (int i = 0, n = m_pMap->GetMapID().size(); i < n; ++i)
+	{
+		for (int j = 0, m = m_pMap->GetMapID()[i].size(); j < m; ++j)
+		{
+			switch (m_pMap->GetMapID()[i][j])
+			{
+			case 1:
+				m_pDraw->Render(static_cast<int>(MAPID::wall), j * m_pMap->GetSpriteSize(), i * m_pMap->GetSpriteSize()
+					, m_pMap->GetSpriteSize(), m_pMap->GetSpriteSize(), false, false);
+				break;
+
+			case 0:
+				m_pDraw->Render(static_cast<int>(MAPID::wallJump), j * m_pMap->GetSpriteSize(), i * m_pMap->GetSpriteSize()
+					, m_pMap->GetSpriteSize(), m_pMap->GetSpriteSize(), false, false);
+				break;
+
+			case 2:
+				m_pDraw->Render(static_cast<int>(MAPID::wallDead), j * m_pMap->GetSpriteSize(), i * m_pMap->GetSpriteSize()
+					, m_pMap->GetSpriteSize(), m_pMap->GetSpriteSize(), false, false);
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+
+	m_pSwapChain->Present(1, 0);/// 画面更新（バックバッファをフロントバッファに）
 }
 
 
 // -----------------------------------------------------------------------------------------------------------
 void Main::DestroyD3D()
 {
+	SAFE_DEL_RELEASE(m_pDraw);
+	SAFE_DEL_RELEASE(m_pMap);
+	SAFE_DEL_RELEASE(m_pCharacter);
 	SAFE_DEL_RELEASE(m_pText);
 	SAFE_RELEASE(m_pSwapChain);
 	SAFE_RELEASE(m_pBackBuffer_TexRTV);

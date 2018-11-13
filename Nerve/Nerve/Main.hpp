@@ -3,6 +3,7 @@
 #include "DebugText.hpp"
 #include "Draw.hpp"
 #include "Character.hpp"
+#include "Map.hpp"
 
 
 class Main
@@ -23,6 +24,7 @@ private:
 	ID3D11Texture2D* m_pBackBuffer_DSTex;
 
 	Character* m_pCharacter;
+	Map* m_pMap;
 	
 
 public:
