@@ -82,5 +82,6 @@ public:
 	float GetXSize();
 	float GetYSize();
 	bool GetRightDire();
+	float Get();
 };
 

@@ -39,8 +39,8 @@ Character::Character()
 {
 	m_ID = 0;
 
-	m_x = 500.0f;
-	m_y = 500.0f;
+	m_x = 0.0f;
+	m_y = 0.0f;
 	m_preY = m_y;
 
 	m_frameWait = 0;
@@ -112,13 +112,13 @@ void Character::Process()
 		// —Ž‚¿‚Ä‚¢‚éÅ’†‚É“®‚¢‚Ä‚¢‚é•ûŒü‚Ì•Ç‚ª•ÇƒWƒƒƒ“o—ˆ‚é‚â‚Â‚¾‚Á‚½‚ç
 		if (m_fallNow
 			&&((m_rightDire
-				&& m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 64) / m_map->GetSpriteSize())] == 2
-				|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 64) / m_map->GetSpriteSize())] == 2)
+				&& m_map->GetMapID()[static_cast<int>((m_y + 16) / m_map->GetSpriteSize())][static_cast<int>((m_x + 64) / m_map->GetSpriteSize())] == 2
+				|| m_map->GetMapID()[static_cast<int>((m_y + 48) / m_map->GetSpriteSize())][static_cast<int>((m_x + 64) / m_map->GetSpriteSize())] == 2)
 				|| (!m_rightDire
-					&& m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x) / m_map->GetSpriteSize())] == 2
-					|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x) / m_map->GetSpriteSize())] == 2)))
+					&& m_map->GetMapID()[static_cast<int>((m_y + 16) / m_map->GetSpriteSize())][static_cast<int>((m_x) / m_map->GetSpriteSize())] == 2
+					|| m_map->GetMapID()[static_cast<int>((m_y + 48) / m_map->GetSpriteSize())][static_cast<int>((m_x) / m_map->GetSpriteSize())] == 2)))
 		{
-			m_gravityPower += 0.1f;
+			m_gravityPower = 36;
 
 			if (InputPad::GetPadButtonData(XINPUT_PAD::NUM01, XINPUT_PAD::BUTTON_A) == 1)
 			{
@@ -246,4 +246,9 @@ float Character::GetYSize()
 bool Character::GetRightDire()
 {
 	return m_rightDire;
+}
+
+float Character::Get()
+{
+	return m_gravityPower;
 }
