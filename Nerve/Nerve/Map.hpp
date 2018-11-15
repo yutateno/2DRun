@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 
-enum class MAPID { wall = 8, wallJump, wallDead };
+enum class MAPID { wall = 9, wallJump, wallDead };
 
 class Map
 {

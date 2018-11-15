@@ -50,7 +50,7 @@ Character::Character()
 
 	m_rightDire = true;
 
-	m_speed = 4;
+	m_speed = 6;
 
 	m_map = new Map;
 
@@ -60,6 +60,9 @@ Character::Character()
 	m_jumpPower = 10;
 	m_gravityPower = 0;
 	m_fallNow = false;
+	m_wallJump = false;
+
+	m_mapDrawAddX = 0.0f;
 
 	ZeroMemory(m_direction, sizeof(m_direction));
 }
@@ -71,7 +74,29 @@ Character::~Character()
 
 void Character::Process()
 {
-	FrameSprite(MOVE_DIRE::walk);
+	if (m_groundFlag)
+	{
+		FrameSprite(MOVE_DIRE::walk);
+	}
+	else
+	{
+		if (m_fallNow)
+		{
+			FrameSprite(MOVE_DIRE::fall);
+		}
+		else
+		{
+			if (m_wallJump)
+			{
+				m_wallJump = false;
+				FrameSprite(MOVE_DIRE::wallJump);
+			}
+			else
+			{
+				FrameSprite(MOVE_DIRE::jump);
+			}
+		}
+	}
 
 	m_preY = m_y;
 
@@ -122,6 +147,7 @@ void Character::Process()
 
 			if (InputPad::GetPadButtonData(XINPUT_PAD::NUM01, XINPUT_PAD::BUTTON_A) == 1)
 			{
+				m_wallJump = true;
 				if (m_rightDire)
 				{
 					m_x -= 1;
@@ -216,6 +242,25 @@ void Character::Process()
 	{
 		m_fallNow = true;
 	}
+
+
+	// カメラの位置をプレイヤーの座標から計算して代入
+	if ((int)m_x < (980 - 32))		// 左端
+	{
+		m_mapDrawAddX = 0;
+		m_drawX = m_x;
+	}
+	else if (m_x > ((m_map->GetMapID()[0].size() - 1) * 64) - (960 - 32))		// 右端
+	{
+		m_mapDrawAddX = m_map->GetMapID()[0].size() * 64 - 1920;
+		m_drawX = m_x - (m_map->GetMapID()[0].size() * 64 - 1920);
+	}
+	else		// それ以外
+	{
+		m_mapDrawAddX = m_x - (960 - 32);
+		m_drawX = 960 - 32;
+	}
+	m_drawY = m_y;
 }
 
 int Character::GetID()
@@ -225,12 +270,12 @@ int Character::GetID()
 
 float Character::GetX()
 {
-	return m_x;
+	return m_drawX;
 }
 
 float Character::GetY()
 {
-	return m_y;
+	return m_drawY;
 }
 
 float Character::GetXSize()
@@ -248,7 +293,7 @@ bool Character::GetRightDire()
 	return m_rightDire;
 }
 
-float Character::Get()
+float Character::GetMapDrawAddX()
 {
-	return m_gravityPower;
+	return m_mapDrawAddX;
 }

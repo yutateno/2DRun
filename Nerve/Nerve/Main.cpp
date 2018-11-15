@@ -258,11 +258,12 @@ HRESULT Main::InitD3D()
 
 	/// ƒQ[ƒ€‚Ì‘fÞ‚Ì‰Šú‰»
 	m_pDraw = new Draw;
-	const int fileNum = 11;
+	const int fileNum = 12;
 	LPCWSTR fileName[] = { L"media\\clph_2d\\scrollaction\\walk\\1.png" , L"media\\clph_2d\\scrollaction\\walk\\2.png"
 						 , L"media\\clph_2d\\scrollaction\\walk\\3.png" , L"media\\clph_2d\\scrollaction\\walk\\4.png"
 						 , L"media\\clph_2d\\scrollaction\\walk\\5.png" , L"media\\clph_2d\\scrollaction\\walk\\6.png"
 						 , L"media\\clph_2d\\scrollaction\\ex\\fall.png" , L"media\\clph_2d\\scrollaction\\ex\\jamp.png"
+						 , L"media\\clph_2d\\scrollaction\\ex\\jamp2.png"
 						 , L"media\\map\\kabe.png" , L"media\\map\\jumpKabe.png" , L"media\\map\\kabeDead.png" };
 	if (FAILED(m_pDraw->Init(m_pDeviceContext, WINDOW_WIDTH, WINDOW_HEIGHT, fileName, fileNum, 64, 64)))
 	{
@@ -299,7 +300,7 @@ void Main::Render()
 	m_pText->Render(str, 0, 10);
 
 	static char strr[256];
-	sprintf(strr, "test=%f", m_pCharacter->Get());
+	sprintf(strr, "test=%f", m_pCharacter->GetX());
 	m_pText->Render(strr, 0, 30);
 
 
@@ -311,20 +312,27 @@ void Main::Render()
 	{
 		for (int j = 0, m = m_pMap->GetMapID()[i].size(); j < m; ++j)
 		{
+			float tempX = j * m_pMap->GetSpriteSize() - m_pCharacter->GetMapDrawAddX();
+			float tempY = i * m_pMap->GetSpriteSize();
+			if (tempX > 1920 || tempX < -64 || tempY > 1080 || tempY < -64)
+			{
+				continue;
+			}
+
 			switch (m_pMap->GetMapID()[i][j])
 			{
 			case 1:
-				m_pDraw->Render(static_cast<int>(MAPID::wall), j * m_pMap->GetSpriteSize(), i * m_pMap->GetSpriteSize()
+				m_pDraw->Render(static_cast<int>(MAPID::wall), tempX, tempY
 					, m_pMap->GetSpriteSize(), m_pMap->GetSpriteSize(), false, false);
 				break;
 
 			case 0:
-				m_pDraw->Render(static_cast<int>(MAPID::wallJump), j * m_pMap->GetSpriteSize(), i * m_pMap->GetSpriteSize()
+				m_pDraw->Render(static_cast<int>(MAPID::wallJump), tempX, tempY
 					, m_pMap->GetSpriteSize(), m_pMap->GetSpriteSize(), false, false);
 				break;
 
 			case 2:
-				m_pDraw->Render(static_cast<int>(MAPID::wallDead), j * m_pMap->GetSpriteSize(), i * m_pMap->GetSpriteSize()
+				m_pDraw->Render(static_cast<int>(MAPID::wallDead), tempX, tempY
 					, m_pMap->GetSpriteSize(), m_pMap->GetSpriteSize(), false, false);
 				break;
 
