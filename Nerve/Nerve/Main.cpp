@@ -314,7 +314,7 @@ void Main::Render()
 		{
 			float tempX = j * m_pMap->GetSpriteSize() - m_pCharacter->GetMapDrawAddX();
 			float tempY = i * m_pMap->GetSpriteSize();
-			if (tempX > 1920 || tempX < -64 || tempY > 1080 || tempY < -64)
+			if (tempX > BASE_WIDTH || tempX < -64 || tempY > BASE_HEIGHT || tempY < -64)
 			{
 				continue;
 			}

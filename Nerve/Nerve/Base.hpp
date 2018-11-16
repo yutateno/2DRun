@@ -36,6 +36,8 @@
 
 #ifndef _BASE_HPP
 #define _BASE_HPP
-static int WINDOW_WIDTH = 1920;	//ウィンドウ幅
-static int WINDOW_HEIGHT = 1080; //ウィンドウ高さ
+static int WINDOW_WIDTH = 1024;	//ウィンドウ幅
+static int WINDOW_HEIGHT = 768; //ウィンドウ高さ
+const int BASE_WIDTH = 1024;
+const int BASE_HEIGHT = 768;
 #endif // _BASE_HPP

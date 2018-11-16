@@ -2,6 +2,7 @@
 #include <string>
 #include "Input.hpp"
 #include "Map.hpp"
+#include "Base.hpp"
 
 
 class Character
@@ -34,7 +35,7 @@ private:
 	int m_frameWait;
 
 	/// コマ送り待機時間
-	const int m_frameWaitTimer = 5;
+	const int m_frameWaitTimer = 10;
 
 	/// スプライトサイズ
 	float m_xSize, m_ySize;
