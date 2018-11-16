@@ -48,6 +48,11 @@ Character::Character()
 	m_xSize = 64.0f;
 	m_ySize = 64.0f;
 
+	m_collXSize = 3.0f;
+	m_collYSize = 3.0f;
+
+	m_wallJumpAbleYSize = 16.0f;
+
 	m_rightDire = true;
 
 	m_speed = 4;
@@ -63,6 +68,8 @@ Character::Character()
 	m_wallJump = false;
 
 	m_mapDrawAddX = 0.0f;
+
+	m_wallGravity = 36.0f;
 
 	ZeroMemory(m_direction, sizeof(m_direction));
 }
@@ -105,11 +112,11 @@ void Character::Process()
 	{
 		m_x += m_speed;
 		// 埋まったら
-		if (m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0
-			|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0)
+		if (m_map->GetMapID()[static_cast<int>((m_y + m_collYSize) / m_map->GetSpriteSize())][static_cast<int>((m_x + (m_xSize - m_collXSize)) / m_map->GetSpriteSize())] != 0
+			|| m_map->GetMapID()[static_cast<int>((m_y + (m_ySize - m_collYSize)) / m_map->GetSpriteSize())][static_cast<int>((m_x + (m_xSize - m_collXSize)) / m_map->GetSpriteSize())] != 0)
 		{
-			while (m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0
-				|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0)
+			while (m_map->GetMapID()[static_cast<int>((m_y + m_collYSize) / m_map->GetSpriteSize())][static_cast<int>((m_x + (m_xSize - m_collXSize)) / m_map->GetSpriteSize())] != 0
+				|| m_map->GetMapID()[static_cast<int>((m_y + (m_ySize - m_collYSize)) / m_map->GetSpriteSize())][static_cast<int>((m_x + (m_xSize - m_collXSize)) / m_map->GetSpriteSize())] != 0)
 			{
 				m_x -= 1;
 			}
@@ -120,11 +127,11 @@ void Character::Process()
 	{
 		m_x -= m_speed;
 		// 埋まったら
-		if (m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0
-			|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0)
+		if (m_map->GetMapID()[static_cast<int>((m_y + m_collYSize) / m_map->GetSpriteSize())][static_cast<int>((m_x + m_collXSize) / m_map->GetSpriteSize())] != 0
+			|| m_map->GetMapID()[static_cast<int>((m_y + (m_ySize - m_collYSize)) / m_map->GetSpriteSize())][static_cast<int>((m_x + m_collXSize) / m_map->GetSpriteSize())] != 0)
 		{
-			while (m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0
-				|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0)
+			while (m_map->GetMapID()[static_cast<int>((m_y + m_collYSize) / m_map->GetSpriteSize())][static_cast<int>((m_x + m_collXSize) / m_map->GetSpriteSize())] != 0
+				|| m_map->GetMapID()[static_cast<int>((m_y + (m_ySize - m_collYSize)) / m_map->GetSpriteSize())][static_cast<int>((m_x + m_collXSize) / m_map->GetSpriteSize())] != 0)
 			{
 				m_x += 1;
 			}
@@ -137,13 +144,13 @@ void Character::Process()
 		// 落ちている最中に動いている方向の壁が壁ジャン出来るやつだったら
 		if (m_fallNow
 			&&((m_rightDire
-				&& m_map->GetMapID()[static_cast<int>((m_y + 16) / m_map->GetSpriteSize())][static_cast<int>((m_x + 64) / m_map->GetSpriteSize())] == 2
-				|| m_map->GetMapID()[static_cast<int>((m_y + 48) / m_map->GetSpriteSize())][static_cast<int>((m_x + 64) / m_map->GetSpriteSize())] == 2)
+				&& m_map->GetMapID()[static_cast<int>((m_y + m_wallJumpAbleYSize) / m_map->GetSpriteSize())][static_cast<int>((m_x + m_xSize) / m_map->GetSpriteSize())] == 2
+				|| m_map->GetMapID()[static_cast<int>((m_y + m_ySize - m_wallJumpAbleYSize) / m_map->GetSpriteSize())][static_cast<int>((m_x + m_xSize) / m_map->GetSpriteSize())] == 2)
 				|| (!m_rightDire
-					&& m_map->GetMapID()[static_cast<int>((m_y + 16) / m_map->GetSpriteSize())][static_cast<int>((m_x) / m_map->GetSpriteSize())] == 2
-					|| m_map->GetMapID()[static_cast<int>((m_y + 48) / m_map->GetSpriteSize())][static_cast<int>((m_x) / m_map->GetSpriteSize())] == 2)))
+					&& m_map->GetMapID()[static_cast<int>((m_y + m_wallJumpAbleYSize) / m_map->GetSpriteSize())][static_cast<int>((m_x) / m_map->GetSpriteSize())] == 2
+					|| m_map->GetMapID()[static_cast<int>((m_y + m_ySize - m_wallJumpAbleYSize) / m_map->GetSpriteSize())][static_cast<int>((m_x) / m_map->GetSpriteSize())] == 2)))
 		{
-			m_gravityPower = 36;
+			m_gravityPower = m_wallGravity;
 
 			if (InputPad::GetPadButtonData(XINPUT_PAD::NUM01, XINPUT_PAD::BUTTON_A) == 1)
 			{
@@ -172,11 +179,11 @@ void Character::Process()
 		m_y += m_gravityPower;
 
 		// 地面に埋まったら
-		if (m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0
-			|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0)
+		if (m_map->GetMapID()[static_cast<int>((m_y + (m_ySize - m_collYSize)) / m_map->GetSpriteSize())][static_cast<int>((m_x + m_collXSize) / m_map->GetSpriteSize())] != 0
+			|| m_map->GetMapID()[static_cast<int>((m_y + (m_ySize - m_collYSize)) / m_map->GetSpriteSize())][static_cast<int>((m_x + (m_xSize - m_collXSize)) / m_map->GetSpriteSize())] != 0)
 		{
-			while (m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0
-				|| m_map->GetMapID()[static_cast<int>((m_y + 61) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0)
+			while (m_map->GetMapID()[static_cast<int>((m_y + (m_ySize - m_collYSize)) / m_map->GetSpriteSize())][static_cast<int>((m_x + m_collXSize) / m_map->GetSpriteSize())] != 0
+				|| m_map->GetMapID()[static_cast<int>((m_y + (m_ySize - m_collYSize)) / m_map->GetSpriteSize())][static_cast<int>((m_x + (m_xSize - m_collXSize)) / m_map->GetSpriteSize())] != 0)
 			{
 				m_y -= 1;
 				m_fallNow = false;
@@ -190,8 +197,8 @@ void Character::Process()
 
 	// 上の端から落ちたら
 	if (m_groundFlag
-		&& m_map->GetMapID()[static_cast<int>((m_y + 64) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] == 0
-		&& m_map->GetMapID()[static_cast<int>((m_y + 64) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] == 0)
+		&& m_map->GetMapID()[static_cast<int>((m_y + m_xSize) / m_map->GetSpriteSize())][static_cast<int>((m_x + m_collXSize) / m_map->GetSpriteSize())] == 0
+		&& m_map->GetMapID()[static_cast<int>((m_y + m_xSize) / m_map->GetSpriteSize())][static_cast<int>((m_x + m_xSize - m_collXSize) / m_map->GetSpriteSize())] == 0)
 	{
 		m_groundFlag = false;
 		m_fallNow = true;
@@ -224,11 +231,11 @@ void Character::Process()
 		m_y -= m_jumpPower;
 
 		// 上に埋まったら
-		if (m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0
-			|| m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0)
+		if (m_map->GetMapID()[static_cast<int>((m_y + m_collYSize) / m_map->GetSpriteSize())][static_cast<int>((m_x + m_collXSize) / m_map->GetSpriteSize())] != 0
+			|| m_map->GetMapID()[static_cast<int>((m_y + m_collYSize) / m_map->GetSpriteSize())][static_cast<int>((m_x + (m_xSize - m_collXSize)) / m_map->GetSpriteSize())] != 0)
 		{
-			while (m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 3) / m_map->GetSpriteSize())] != 0
-				|| m_map->GetMapID()[static_cast<int>((m_y + 3) / m_map->GetSpriteSize())][static_cast<int>((m_x + 61) / m_map->GetSpriteSize())] != 0)
+			while (m_map->GetMapID()[static_cast<int>((m_y + m_collYSize) / m_map->GetSpriteSize())][static_cast<int>((m_x + m_collXSize) / m_map->GetSpriteSize())] != 0
+				|| m_map->GetMapID()[static_cast<int>((m_y + m_collYSize) / m_map->GetSpriteSize())][static_cast<int>((m_x + (m_xSize - m_collXSize)) / m_map->GetSpriteSize())] != 0)
 			{
 				m_y += 1;
 				m_fallNow = true;
@@ -245,20 +252,20 @@ void Character::Process()
 
 
 	// カメラの位置をプレイヤーの座標から計算して代入
-	if ((int)m_x < ((BASE_WIDTH / 2) - 32))		// 左端
+	if ((int)m_x < ((BASE_WIDTH / 2) - (m_xSize / 2)))		// 左端
 	{
 		m_mapDrawAddX = 0;
 		m_drawX = m_x;
 	}
-	else if (m_x > ((m_map->GetMapID()[0].size() - 1) * 64) - ((BASE_WIDTH / 2) - 32))		// 右端
+	else if (m_x > ((m_map->GetMapID()[0].size() - 1) * m_xSize) - ((BASE_WIDTH / 2) - (m_xSize / 2)))		// 右端
 	{
-		m_mapDrawAddX = m_map->GetMapID()[0].size() * 64 - BASE_WIDTH;
-		m_drawX = m_x - (m_map->GetMapID()[0].size() * 64 - BASE_WIDTH);
+		m_mapDrawAddX = m_map->GetMapID()[0].size() * m_xSize - BASE_WIDTH;
+		m_drawX = m_x - (m_map->GetMapID()[0].size() * m_xSize - BASE_WIDTH);
 	}
 	else		// それ以外
 	{
-		m_mapDrawAddX = m_x - ((BASE_WIDTH / 2) - 32);
-		m_drawX = (BASE_WIDTH / 2) - 32;
+		m_mapDrawAddX = m_x - ((BASE_WIDTH / 2) - (m_xSize / 2));
+		m_drawX = (BASE_WIDTH / 2) - (m_xSize / 2);
 	}
 	m_drawY = m_y;
 }

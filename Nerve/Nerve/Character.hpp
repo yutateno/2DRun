@@ -40,6 +40,12 @@ private:
 	/// スプライトサイズ
 	float m_xSize, m_ySize;
 
+	/// スプライトの判定サイズ
+	float m_collXSize, m_collYSize;
+
+	/// 壁ジャンプの高さ範囲
+	float m_wallJumpAbleYSize;
+
 	/// 右向くかどうか
 	bool m_rightDire;
 
@@ -77,6 +83,9 @@ private:
 
 	/// スクロールの都合で加算するマップ描画のX座標
 	float m_mapDrawAddX;
+
+	/// 捕まれる壁につかまっている最中の重力
+	float m_wallGravity;
 
 
 public:
