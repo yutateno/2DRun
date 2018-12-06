@@ -308,6 +308,7 @@ void Main::Render()
 
 
 
+	// ‚±‚±‚Ì‚â‚Î‚¢‘½dƒ‹[ƒvðŒˆ—‚Ç‚¤‚É‚©‚µ‚Ä
 	for (int i = 0, n = m_pMap->GetMapID().size(); i < n; ++i)
 	{
 		for (int j = 0, m = m_pMap->GetMapID()[i].size(); j < m; ++j)
