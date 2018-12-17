@@ -1,17 +1,17 @@
 #include "Main.hpp"
 
 
-// -----------------------------------------------------------------------------------------------------------
-/// グローバル変数
+/// -----------------------------------------------------------------------------------------------------------
+// グローバル変数
 Main* g_pMain = NULL;
 
 
-// -----------------------------------------------------------------------------------------------------------
-/// 関数プロトタイプの宣言
+/// -----------------------------------------------------------------------------------------------------------
+// 関数プロトタイプの宣言
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 
-// -----------------------------------------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------------------------------------
 // アプリケーションのエントリー関数 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT)
 {
@@ -42,7 +42,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT)
 }
 
 
-// -----------------------------------------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------------------------------------
 // OSから見たウィンドウプロシージャー（実際の処理はMAINクラスのプロシージャーで処理）
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -51,23 +51,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 
 
-// -----------------------------------------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------------------------------------
 Main::Main()
 {
 	ZeroMemory(this, sizeof(Main));
 }
 
 
-// -----------------------------------------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------------------------------------
 Main::~Main()
 {
 }
 
 
-// -----------------------------------------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------------------------------------
 HRESULT Main::InitWindow(HINSTANCE hInstance, INT iX, INT iY, INT iWidth, INT iHeight, LPCWSTR WindowName)
 {
-	/// ウィンドウの定義
+	// ウィンドウの定義
 	WNDCLASSEX  wc;
 	ZeroMemory(&wc, sizeof(wc));
 	wc.cbSize				 = sizeof(wc);
@@ -81,23 +81,17 @@ HRESULT Main::InitWindow(HINSTANCE hInstance, INT iX, INT iY, INT iWidth, INT iH
 	wc.hIconSm				 = LoadIcon(NULL, IDI_APPLICATION);
 	RegisterClassEx(&wc);
 
-	RECT rec;
-	m_hWnd = GetDesktopWindow();
-	GetClientRect(m_hWnd, &rec);
-	WINDOW_WIDTH = rec.right;
-	WINDOW_HEIGHT = rec.bottom;
 
-
-	/// ウィンドウの作成
+	// ウィンドウの作成
 	m_hWnd = CreateWindow(WindowName, WindowName, WS_OVERLAPPEDWINDOW,
-		0, 0, rec.right, rec.bottom, 0, 0, hInstance, 0);
+		0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, hInstance, 0);
 	if (!m_hWnd)
 	{
 		return E_FAIL;
 	}
 
 
-	/// ウインドウの表示
+	// ウインドウの表示
 	ShowWindow(m_hWnd, SW_SHOW);
 	UpdateWindow(m_hWnd);
 
@@ -105,7 +99,7 @@ HRESULT Main::InitWindow(HINSTANCE hInstance, INT iX, INT iY, INT iWidth, INT iH
 }
 
 
-// -----------------------------------------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------------------------------------
 LRESULT Main::MsgProc(HWND hWnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (iMsg)
@@ -129,10 +123,10 @@ LRESULT Main::MsgProc(HWND hWnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 }
 
 
-// -----------------------------------------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------------------------------------
 void Main::Run()
 {
-	/// メッセージループ
+	// メッセージループ
 	MSG msg = { 0 };
 	ZeroMemory(&msg, sizeof(msg));
 
@@ -146,15 +140,15 @@ void Main::Run()
 		}
 		else
 		{
-			/// アプリケーションの処理はここから飛ぶ。
+			// アプリケーションの処理はここから飛ぶ。
 			App();
 		}
 	}
-	/// アプリケーションの終了
+	// アプリケーションの終了
 }
 
 
-// -----------------------------------------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------------------------------------
 void Main::App()
 {
 	InputPad::FirstUpdate();
@@ -163,10 +157,10 @@ void Main::App()
 }
 
 
-// -----------------------------------------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------------------------------------
 HRESULT Main::InitD3D()
 {
-	/// デバイスとスワップチェーンの作成
+	// デバイスとスワップチェーンの作成
 	DXGI_SWAP_CHAIN_DESC sd;
 	ZeroMemory(&sd, sizeof(sd));
 	sd.BufferCount							 = 1;
@@ -194,14 +188,14 @@ HRESULT Main::InitD3D()
 
 	// 各種テクスチャーと、それに付帯する各種ビューを作成
 
-	/// バックバッファーテクスチャーを取得（既にあるので作成ではない）
+	// バックバッファーテクスチャーを取得（既にあるので作成ではない）
 	ID3D11Texture2D *pBackBuffer_Tex;
 	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer_Tex);
-	/// そのテクスチャーに対しレンダーターゲットビュー(RTV)を作成
+	// そのテクスチャーに対しレンダーターゲットビュー(RTV)を作成
 	m_pDevice->CreateRenderTargetView(pBackBuffer_Tex, NULL, &m_pBackBuffer_TexRTV);
 	SAFE_RELEASE(pBackBuffer_Tex);
 
-	/// デプスステンシルビュー用のテクスチャーを作成
+	// デプスステンシルビュー用のテクスチャーを作成
 	D3D11_TEXTURE2D_DESC descDepth;
 	descDepth.Width					 = WINDOW_WIDTH;
 	descDepth.Height				 = WINDOW_HEIGHT;
@@ -215,13 +209,13 @@ HRESULT Main::InitD3D()
 	descDepth.CPUAccessFlags		 = 0;
 	descDepth.MiscFlags				 = 0;
 	m_pDevice->CreateTexture2D(&descDepth, NULL, &m_pBackBuffer_DSTex);
-	/// そのテクスチャーに対しデプスステンシルビュー(DSV)を作成
+	// そのテクスチャーに対しデプスステンシルビュー(DSV)を作成
 	m_pDevice->CreateDepthStencilView(m_pBackBuffer_DSTex, NULL, &m_pBackBuffer_DSTexDSV);
 
 
-	/// レンダーターゲットビューと深度ステンシルビューをパイプラインにバインド
+	// レンダーターゲットビューと深度ステンシルビューをパイプラインにバインド
 	m_pDeviceContext->OMSetRenderTargets(1, &m_pBackBuffer_TexRTV, m_pBackBuffer_DSTexDSV);
-	/// ビューポートの設定
+	// ビューポートの設定
 	D3D11_VIEWPORT vp;
 	vp.Width		 = static_cast<FLOAT>(WINDOW_WIDTH);
 	vp.Height		 = static_cast<FLOAT>(WINDOW_HEIGHT);
@@ -231,7 +225,7 @@ HRESULT Main::InitD3D()
 	vp.TopLeftY		 = 0;
 	m_pDeviceContext->RSSetViewports(1, &vp);
 
-	/// ラスタライズ設定
+	// ラスタライズ設定
 	D3D11_RASTERIZER_DESC rdc;
 	ZeroMemory(&rdc, sizeof(rdc));
 	rdc.CullMode				 = D3D11_CULL_NONE;
@@ -242,7 +236,7 @@ HRESULT Main::InitD3D()
 	m_pDeviceContext->RSSetState(pIr);
 
 	
-	/// 文字列レンダリングの初期化
+	// 文字列レンダリングの初期化
 	m_pText = new DebugText;
 	D3DXVECTOR4 vColor(0.9, 0.6, 0, 1);
 	if (FAILED(m_pText->Init(m_pDeviceContext, WINDOW_WIDTH, WINDOW_HEIGHT, 50, vColor)))
@@ -256,7 +250,7 @@ HRESULT Main::InitD3D()
 	m_pMap = new Map;
 
 
-	/// ゲームの素材の初期化
+	// ゲームの素材の初期化
 	m_pDraw = new Draw;
 	const int fileNum = 12;
 	LPCWSTR fileName[] = { L"media\\clph_2d\\scrollaction\\walk\\1.png" , L"media\\clph_2d\\scrollaction\\walk\\2.png"
@@ -271,22 +265,24 @@ HRESULT Main::InitD3D()
 	}
 
 
-	/// フルスクリーンにする（DirectX11なのでALT+Enterで切り替え可
-	m_pSwapChain->SetFullscreenState(false, 0);
+	// フルスクリーンにする（DirectX11なのでALT+Enterで切り替え可
+	m_pSwapChain->SetFullscreenState(true, 0);
 
 
 	return S_OK;
 }
 
 
-// -----------------------------------------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------------------------------------
 void Main::Render()
 {
 	/// 画面クリア
-	float ClearColor[4] = { 0,1,1,1 };	/// クリア色作成　RGBAの順
-	m_pDeviceContext->ClearRenderTargetView(m_pBackBuffer_TexRTV, ClearColor);						/// カラーバッファクリア
-	m_pDeviceContext->ClearDepthStencilView(m_pBackBuffer_DSTexDSV, D3D11_CLEAR_DEPTH, 1.0f, 0);	/// デプスステンシルバッファクリア
+	float ClearColor[4] = { 0,1,1,1 };	// クリア色作成　RGBAの順
+	m_pDeviceContext->ClearRenderTargetView(m_pBackBuffer_TexRTV, ClearColor);						// カラーバッファクリア
+	m_pDeviceContext->ClearDepthStencilView(m_pBackBuffer_DSTexDSV, D3D11_CLEAR_DEPTH, 1.0f, 0);	// デプスステンシルバッファクリア
 
+
+	// FPS表示
 	static DWORD time = 0;
 	static int frame = 0;
 	frame++;
@@ -299,19 +295,17 @@ void Main::Render()
 	}
 	m_pText->Render(str, 0, 10);
 
-	static char strr[256];
-	sprintf(strr, "test=%f", m_pCharacter->GetX());
-	m_pText->Render(strr, 0, 30);
 
-
-	m_pDraw->Render(m_pCharacter->GetID(), m_pCharacter->GetX(), m_pCharacter->GetY(), m_pCharacter->GetXSize(), m_pCharacter->GetYSize(), m_pCharacter->GetRightDire(), false);
+	// キャラクター描画
+	m_pDraw->Render(m_pCharacter->GetID(), m_pCharacter->GetX(), m_pCharacter->GetY()
+		, m_pCharacter->GetXSize(), m_pCharacter->GetYSize(), m_pCharacter->GetRightDire(), false);
 
 
 
-	// ここのやばい多重ループ条件処理どうにかして
-	for (int i = 0, n = m_pMap->GetMapID().size(); i < n; ++i)
+	// マップ描画
+	for (int i = 0, n = m_pMap->GetMapID().size(); i != n; ++i)
 	{
-		for (int j = 0, m = m_pMap->GetMapID()[i].size(); j < m; ++j)
+		for (int j = 0, m = m_pMap->GetMapID()[i].size(); j != m; ++j)
 		{
 			float tempX = j * m_pMap->GetSpriteSize() - m_pCharacter->GetMapDrawAddX();
 			float tempY = i * m_pMap->GetSpriteSize();
@@ -343,11 +337,11 @@ void Main::Render()
 		}
 	}
 
-	m_pSwapChain->Present(1, 0);/// 画面更新（バックバッファをフロントバッファに）
+	m_pSwapChain->Present(1, 0);	// 画面更新（バックバッファをフロントバッファに）
 }
 
 
-// -----------------------------------------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------------------------------------
 void Main::DestroyD3D()
 {
 	SAFE_DEL_RELEASE(m_pDraw);

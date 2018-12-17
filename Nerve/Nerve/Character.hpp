@@ -10,82 +10,84 @@ class Character
 private:
 	enum class MOVE_DIRE { walk = 0, fall = 6, jump, wallJump };
 
-	/// スプライトの描画のためのID
+	// スプライトの描画のためのID
 	int m_ID;
 
-	/// スプライトの最大数
+	// スプライトの最大数
 	const int m_spriteNum = 8;
 
-	/// 座標
+	// 座標
 	float m_x, m_y;
 
-	/// 描画での座標
+	// 描画での座標
 	float m_drawX, m_drawY;
 
-	/// スプライトのコマ数を配列用に -1
+	// スプライトのコマ数を配列用に -1
 	const int m_walkFrame = 6;
 
-	/// コマ送り
+	// コマ送り
 	void FrameSprite(MOVE_DIRE direction);
 
-	/// 向きの方向
+	// 向きの方向
 	bool m_direction[4];
 
-	/// コマ送り待機
+	// コマ送り待機
 	int m_frameWait;
 
-	/// コマ送り待機時間
+	// コマ送り待機時間
 	const int m_frameWaitTimer = 10;
 
-	/// スプライトサイズ
+	// スプライトサイズ
 	float m_xSize, m_ySize;
 
-	/// スプライトの判定サイズ
+	// スプライトの判定サイズ
 	float m_collXSize, m_collYSize;
 
-	/// 壁ジャンプの高さ範囲
+	// 壁ジャンプの高さ範囲
 	float m_wallJumpAbleYSize;
 
-	/// 右向くかどうか
+	// 右向くかどうか
 	bool m_rightDire;
 
-	/// スピード
+	// スピード
 	int m_speed;					
 
 
-	/// マップでのあたり判定のため
+	// マップでのあたり判定のため
 	Map* m_map;
 
-	/// ジャンプ関連
-	/// 地面に触れてるか
+	/// ジャンプ関連--------------------------------------------
+
+	// 地面に触れてるか
 	bool m_groundFlag;
 
-	/// ジャンプしているか
+	// ジャンプしているか
 	bool m_jumpFlag;
 
-	/// 長押しジャンプか
+	// 長押しジャンプか
 	bool m_longJump;		
 
-	/// ジャンプ力
+	// ジャンプ力
 	float m_jumpPower;	
 
-	/// 重力
+	// 重力
 	float m_gravityPower;	
 
-	/// 落ちているかどうか
+	// 落ちているかどうか
 	float m_fallNow;
 
-	/// 直前のY座標
+	// 直前のY座標
 	float m_preY;
 
-	/// 壁からのジャンプかどうか
+	// 壁からのジャンプかどうか
 	bool m_wallJump;
 
-	/// スクロールの都合で加算するマップ描画のX座標
+	// スクロールの都合で加算するマップ描画のX座標
 	float m_mapDrawAddX;
 
-	/// 捕まれる壁につかまっている最中の重力
+	// 捕まれる壁につかまっている最中の重力
 	float m_wallGravity;
+	/// --------------------------------------------------------
 
 
 public:
